@@ -1,28 +1,45 @@
-#include <iostream> #include <vector>
- 
-#include <queue> using namespace std;
+#include <iostream>
+#include <vector>
+using namespace std;
 
-void BFS(int start, vector<vector<int>>& adj) { vector<bool> visited(adj.size(), false); queue<int> q;
-
-visited[start] = true; q.push(start);
-
-cout << "BFS: "; while (!q.empty()) {
-int u = q.front(); q.pop(); cout << u << " ";
-
-for (int v : adj[u]) {
-if (!visited[v]) { visited[v] = true; q.push(v);
-}
-}
-}
-}
-
-
-int main() { vector<vector<int>> adj = {
-{1, 2}, // 0
-{0, 3}, // 1
-{0, 3}, // 2
-{1, 2}  // 3
+class Graph {
+    int V;
+    vector<vector<int>> adj;
+    void dfsUtil(int v, vector<bool> &visited, vector<int> &order) {
+        visited[v] = true;
+        order.push_back(v);
+        for (int u : adj[v]) {
+            if (!visited[u]) {
+                dfsUtil(u, visited, order);
+            }
+        }
+    }
+public:
+    Graph(int vertices): V(vertices), adj(vertices) {}
+    void addEdge(int v, int w, bool directed = false) {
+        adj[v].push_back(w);
+        if (!directed) adj[w].push_back(v);
+    }
+    vector<int> dfs(int start) {
+        vector<bool> visited(V, false);
+        vector<int> order;
+        dfsUtil(start, visited, order);
+        return order;
+    }
 };
- 
-BFS(0, adj);
+
+int main() {
+    int V = 5;
+    Graph g(V);
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(1, 3);
+    g.addEdge(2, 4);
+    int start = 0;
+    vector<int> res = g.dfs(start);
+    for (int v : res) {
+        cout << v << " ";
+    }
+    cout << "\n";
+    return 0;
 }
