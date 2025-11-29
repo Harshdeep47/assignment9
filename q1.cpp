@@ -1,67 +1,50 @@
-#include <iostream> #include <vector> using namespace std;
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
 
-class Graph { int V;
-vector<vector<int>> adjMatrix; vector<vector<int>> adjList;
-
+class Graph {
+    int V;
+    vector<vector<int>> adj;
 public:
-Graph(int V) : V(V) {
-adjMatrix.assign(V, vector<int>(V, 0)); adjList.assign(V, {});
-}
-
-
-void addEdge(int u, int v) { adjMatrix[u][v] = 1;
-adjMatrix[v][u] = 1;
-
-
-adjList[u].push_back(v); adjList[v].push_back(u);
-}
-
-
-void printAdjMatrix() {
-cout << "Adjacency Matrix:\n"; for (int i = 0; i < V; i++) {
-for (int j = 0; j < V; j++)
-cout << adjMatrix[i][j] << " ";
- 
-cout << endl;
-}
-}
-
-
-void printAdjList() {
-cout << "Adjacency List:\n"; for (int i = 0; i < V; i++) {
-cout << i << ": ";
-for (int v : adjList[i]) cout << v << " "; cout << endl;
-}
-}
-
-
-int degree(int v) {
-return adjList[v].size();
-}
-
-
-void adjacentVertices(int v) {
-cout << "Adjacent vertices of " << v << ": "; for (int x : adjList[v]) cout << x << " ";
-cout << endl;
-}
-
-
-int numberOfEdges() { int cnt = 0;
-for (int i = 0; i < V; i++) cnt += adjList[i].size();
-return cnt / 2;
-}
+    Graph(int vertices): V(vertices), adj(vertices) {}
+    void addEdge(int u, int v, bool directed = false) {
+        adj[u].push_back(v);
+        if (!directed) adj[v].push_back(u);
+    }
+    vector<int> bfs(int start) {
+        vector<bool> visited(V, false);
+        queue<int> q;
+        vector<int> order;
+        visited[start] = true;
+        q.push(start);
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            order.push_back(u);
+            for (int v: adj[u]) {
+                if (!visited[v]) {
+                    visited[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+        return order;
+    }
 };
- 
-int main() { Graph g(5);
-
-g.addEdge(0, 1);
-g.addEdge(0, 4);
-g.addEdge(1, 2);
-g.addEdge(1, 3);
-
-
-g.printAdjMatrix(); g.printAdjList();
-
-cout << "Degree of 1: " << g.degree(1) << endl; g.adjacentVertices(1);
-cout << "Number of edges: " << g.numberOfEdges() << endl;
+int main() {
+    int V = 7;
+    Graph g(V);
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(1, 3);
+    g.addEdge(1, 4);
+    g.addEdge(2, 5);
+    g.addEdge(2, 6);
+    int start = 0;
+    vector<int> res = g.bfs(start);
+    for (int u: res) {
+        cout << u << " ";
+    }
+    cout << "\n";
+    return 0;
 }
